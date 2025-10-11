@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BasicPage from "@/components/BasicPage";
 import EnhancedPage from "@/components/EnhancedPage";
 import PageLayout from "@/components/PageLayout";
@@ -8,53 +8,42 @@ type GameMode = "enhanced" | "basic";
 
 export default function Page() {
   const [mode, setMode] = useState<GameMode>("enhanced");
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   return (
     <PageLayout>
       {/* Mode Toggle */}
-      <div style={{
-        position: 'fixed',
-        top: '20px',
-        right: '20px',
-        zIndex: 1000,
-        backgroundColor: '#1a1a1a',
-        border: '2px solid #333',
-        borderRadius: '8px',
-        padding: '8px',
-        display: 'flex',
-        gap: '4px'
-      }}>
+      <div className={`fixed right-5 z-50 bg-gray-800 border-2 border-gray-600 rounded-lg p-1.5 flex gap-0.5 shadow-lg ${
+        isMobile ? 'top-20' : 'top-5'
+      }`}>
         <button
           onClick={() => setMode("enhanced")}
-          style={{
-            padding: '8px 16px',
-            borderRadius: '6px',
-            border: 'none',
-            backgroundColor: mode === "enhanced" ? '#4CAF50' : '#333',
-            color: 'white',
-            cursor: 'pointer',
-            fontSize: '12px',
-            fontWeight: 'bold',
-            transition: 'background-color 0.2s ease'
-          }}
+          className={`px-3 lg:px-4 py-1.5 lg:py-2 rounded-md border-none text-white font-bold transition-colors touch-manipulation text-xs lg:text-sm ${
+            mode === "enhanced" 
+              ? 'bg-green-500 hover:bg-green-600' 
+              : 'bg-gray-700 hover:bg-gray-600'
+          }`}
         >
-          🎮 Enhanced
+          {isMobile ? '🎮' : '🎮 Enhanced'}
         </button>
         <button
           onClick={() => setMode("basic")}
-          style={{
-            padding: '8px 16px',
-            borderRadius: '6px',
-            border: 'none',
-            backgroundColor: mode === "basic" ? '#4CAF50' : '#333',
-            color: 'white',
-            cursor: 'pointer',
-            fontSize: '12px',
-            fontWeight: 'bold',
-            transition: 'background-color 0.2s ease'
-          }}
+          className={`px-3 lg:px-4 py-1.5 lg:py-2 rounded-md border-none text-white font-bold transition-colors touch-manipulation text-xs lg:text-sm ${
+            mode === "basic" 
+              ? 'bg-green-500 hover:bg-green-600' 
+              : 'bg-gray-700 hover:bg-gray-600'
+          }`}
         >
-          📝 Basic
+          {isMobile ? '📝' : '📝 Basic'}
         </button>
       </div>
 

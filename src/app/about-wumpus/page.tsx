@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Link from "next/link";
 import PageLayout from "@/components/PageLayout";
 
 export default function AboutWumpusPage() {
@@ -81,8 +82,8 @@ export default function AboutWumpusPage() {
           }}
         >
           <p style={{ margin: "0 0 16px 0" }}>
-            Wumpus World, originally called "Hunt the Wumpus," was created by <strong style={{ color: "#FFD700" }}>Gregory Yob</strong> in 1973. 
-            Yob designed this game as a response to the then-popular "Hunt the Wumpus" text adventure game, 
+            Wumpus World, originally called &quot;Hunt the Wumpus,&quot; was created by <strong style={{ color: "#FFD700" }}>Gregory Yob</strong> in 1973. 
+            Yob designed this game as a response to the then-popular &quot;Hunt the Wumpus&quot; text adventure game, 
             but with a twist that would make it perfect for artificial intelligence research.
           </p>
           <p style={{ margin: "0 0 16px 0" }}>
@@ -198,7 +199,7 @@ export default function AboutWumpusPage() {
         >
           <p style={{ margin: "0 0 16px 0" }}>
             Wumpus World represents a perfect balance between simplicity and complexity. 
-            It's simple enough for beginners to understand, yet complex enough to challenge 
+            It&apos;s simple enough for beginners to understand, yet complex enough to challenge 
             advanced AI systems. This makes it an ideal benchmark for:
           </p>
           <div
@@ -426,7 +427,7 @@ export default function AboutWumpusPage() {
         <p style={{ margin: "0 0 8px 0" }}>
           Ready to test your logical reasoning skills?
         </p>
-        <a
+        <Link
           href="/"
           style={{
             color: "#4CAF50",
@@ -436,7 +437,7 @@ export default function AboutWumpusPage() {
           }}
         >
           🎮 Play Wumpus World Now →
-        </a>
+        </Link>
       </div>
       </main>
     </PageLayout>

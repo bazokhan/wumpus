@@ -176,7 +176,7 @@ export const Gold = () => (
 
 // Percept indicators
 export const BreezeIndicator = () => (
-  <div style={{ position: "absolute", top: 2, left: 2 }}>
+  <div>
     <svg width="16" height="16" viewBox="0 0 16 16">
       <path
         d="M2,8 Q4,4 8,6 Q12,8 14,4"
@@ -195,7 +195,7 @@ export const BreezeIndicator = () => (
 );
 
 export const StenchIndicator = () => (
-  <div style={{ position: "absolute", top: 2, right: 2 }}>
+  <div>
     <svg width="16" height="16" viewBox="0 0 16 16">
       <circle cx="8" cy="8" r="6" fill="#8B4513" opacity="0.7" />
       <circle cx="6" cy="6" r="2" fill="#8B4513" opacity="0.5" />
@@ -206,7 +206,7 @@ export const StenchIndicator = () => (
 );
 
 export const GlitterIndicator = () => (
-  <div style={{ position: "absolute", bottom: 2, left: 2 }}>
+  <div>
     <svg width="16" height="16" viewBox="0 0 16 16">
       <polygon points="8,2 9,6 5,6" fill="#FFD700" />
       <polygon points="14,8 10,9 10,7" fill="#FFD700" />
@@ -218,7 +218,7 @@ export const GlitterIndicator = () => (
 );
 
 export const BumpIndicator = () => (
-  <div style={{ position: "absolute", bottom: 2, right: 2 }}>
+  <div>
     <svg width="16" height="16" viewBox="0 0 16 16">
       <circle cx="8" cy="8" r="6" fill="#FF6B6B" opacity="0.8" />
       <text x="8" y="11" textAnchor="middle" fontSize="10" fill="white">

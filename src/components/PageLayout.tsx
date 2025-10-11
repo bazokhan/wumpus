@@ -24,6 +24,7 @@ export default function PageLayout({ children }: PageLayoutProps) {
         marginLeft: isMobile ? "0" : "260px", // Account for sidebar width on desktop only
         transition: "margin-left 0.3s ease",
         minHeight: "100vh",
+        paddingTop: isMobile ? "60px" : "0", // Account for mobile hamburger button
       }}
     >
       {children}

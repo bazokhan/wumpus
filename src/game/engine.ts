@@ -1,14 +1,60 @@
 import type { Action, AgentState, GameState, Grid, Percepts } from "./types";
 
+// Simple seeded random number generator (LCG algorithm)
+function seededRandom(seed: number) {
+  let state = seed;
+  return function() {
+    state = (state * 1664525 + 1013904223) % 2**32;
+    return state / 2**32;
+  };
+}
+
 export function newGrid(n: number, seed = 42): Grid {
-  // Minimal: place one wumpus, one gold, a few pits (not at 0,0). Replace with seeded RNG as needed.
+  const random = seededRandom(seed);
   const g: Grid = Array.from({ length: n }, () =>
     Array.from({ length: n }, () => ({}))
   );
-  g[n - 1][n - 1].wumpus = true;
-  g[1][2].pit = true;
-  g[2][1].pit = true;
-  g[2][2].gold = true;
+
+  // Helper to get random cell that's not (0,0) and not already occupied
+  const getRandomEmptyCell = (exclude: Set<string> = new Set()): [number, number] => {
+    let attempts = 0;
+    while (attempts < 100) {
+      const x = Math.floor(random() * n);
+      const y = Math.floor(random() * n);
+      const key = `${x},${y}`;
+      
+      // Skip starting position (0,0) and already occupied cells
+      if ((x === 0 && y === 0) || exclude.has(key)) {
+        attempts++;
+        continue;
+      }
+      
+      return [x, y];
+    }
+    // Fallback if we can't find a spot
+    return [n - 1, n - 1];
+  };
+
+  const occupied = new Set<string>();
+
+  // Place exactly one Wumpus
+  const [wumpusX, wumpusY] = getRandomEmptyCell(occupied);
+  g[wumpusY][wumpusX].wumpus = true;
+  occupied.add(`${wumpusX},${wumpusY}`);
+
+  // Place exactly one Gold
+  const [goldX, goldY] = getRandomEmptyCell(occupied);
+  g[goldY][goldX].gold = true;
+  occupied.add(`${goldX},${goldY}`);
+
+  // Place 2-4 pits (scaled by grid size)
+  const numPits = Math.max(2, Math.min(Math.floor(n * 0.8), Math.floor(random() * 3) + 2));
+  for (let i = 0; i < numPits; i++) {
+    const [pitX, pitY] = getRandomEmptyCell(occupied);
+    g[pitY][pitX].pit = true;
+    occupied.add(`${pitX},${pitY}`);
+  }
+
   return g;
 }
 
@@ -21,10 +67,12 @@ export function startGame(gridSize = 4): GameState {
     arrow: 1,
     alive: true,
   };
+  // Generate random seed for each new game to ensure different grids
+  const seed = Math.floor(Math.random() * 1000000);
   return {
     gameId: crypto.randomUUID(),
     gridSize,
-    grid: newGrid(gridSize),
+    grid: newGrid(gridSize, seed),
     agent,
     terminal: false,
     totalReward: 0,

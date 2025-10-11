@@ -181,7 +181,7 @@ export default function AboutPage() {
                 margin: "0 0 8px 0",
               }}
             >
-              Student, Professional Master's in Cloud Computing Networks
+              Student, Professional Master&apos;s in Cloud Computing Networks
             </h3>
             <p
               style={{
@@ -191,8 +191,8 @@ export default function AboutPage() {
                 margin: "0 0 20px 0",
               }}
             >
-              A dedicated student pursuing the Professional Master's degree in Cloud Computing Networks 
-              at <strong style={{ color: "#FFD700" }}>Cairo University's Faculty of Computer Science and Artificial Intelligence</strong>.
+              A dedicated student pursuing the Professional Master&apos;s degree in Cloud Computing Networks 
+              at <strong style={{ color: "#FFD700" }}>Cairo University&apos;s Faculty of Computer Science and Artificial Intelligence</strong>.
             </p>
             
             {/* Social Links */}
@@ -278,7 +278,7 @@ export default function AboutPage() {
             practical applications in cloud technologies.
           </p>
           <p style={{ margin: "0" }}>
-            The Wumpus World implementation you're experiencing is a demonstration of my passion 
+            The Wumpus World implementation you&apos;re experiencing is a demonstration of my passion 
             for combining classical AI concepts with modern web technologies, showcasing skills 
             in full-stack development, game logic implementation, and user interface design.
           </p>
@@ -519,7 +519,7 @@ export default function AboutPage() {
             fontSize: "16px",
           }}
         >
-          💼 Let's Connect on LinkedIn →
+          💼 Let&apos;s Connect on LinkedIn →
         </a>
       </div>
       </main>

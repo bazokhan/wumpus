@@ -44,6 +44,23 @@ button, a, .sidebar, .page-layout {
   transition: all 0.2s ease;
 }
 
+/* Mobile touch improvements */
+@media (max-width: 767px) {
+  button {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  
+  .control-button {
+    min-height: 44px; /* iOS minimum touch target */
+  }
+  
+  /* Prevent zoom on input focus */
+  input, select, textarea {
+    font-size: 16px;
+  }
+}
+
 /* Custom scrollbar for webkit browsers */
 ::-webkit-scrollbar {
   width: 8px;

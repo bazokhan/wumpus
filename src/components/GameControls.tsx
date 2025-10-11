@@ -59,183 +59,74 @@ export default function GameControls({
 
   return (
     <div className="game-controls">
-      <div
-        className="controls-grid"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-          gap: "12px",
-          marginBottom: "16px",
-        }}
-      >
+      <div className="grid grid-cols-2 lg:grid-cols-1 gap-2 mb-4">
         {controls.map((control) => (
           <button
             key={control.action}
             onClick={() => onAction(control.action)}
             disabled={disabled || control.disabled || !agentAlive}
-            className={`control-button ${!agentAlive ? "game-over" : ""}`}
-            style={{
-              padding: "12px 16px",
-              border: "2px solid #444",
-              borderRadius: "8px",
-              backgroundColor:
-                disabled || control.disabled || !agentAlive
-                  ? "#333"
-                  : "#2a2a2a",
-              color:
-                disabled || control.disabled || !agentAlive ? "#666" : "#fff",
-              cursor:
-                disabled || control.disabled || !agentAlive
-                  ? "not-allowed"
-                  : "pointer",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "4px",
-              transition: "all 0.2s ease",
-              fontSize: "14px",
-              fontFamily: "inherit",
-            }}
-            onMouseEnter={(e) => {
-              if (!disabled && !control.disabled && agentAlive) {
-                e.currentTarget.style.backgroundColor = "#3a3a3a";
-                e.currentTarget.style.borderColor = "#666";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!disabled && !control.disabled && agentAlive) {
-                e.currentTarget.style.backgroundColor = "#2a2a2a";
-                e.currentTarget.style.borderColor = "#444";
-              }
-            }}
+            className={`flex flex-col items-center gap-1 p-3 lg:p-4 border-2 rounded-lg transition-all duration-200 min-h-[80px] lg:min-h-[100px] touch-manipulation ${
+              disabled || control.disabled || !agentAlive
+                ? "bg-gray-700 border-gray-600 text-gray-500 cursor-not-allowed"
+                : "bg-gray-800 border-gray-600 text-white cursor-pointer hover:bg-gray-700 hover:border-gray-500"
+            }`}
           >
-            <div style={{ fontSize: "20px" }}>{control.icon}</div>
-            <div style={{ fontWeight: "bold" }}>{control.label}</div>
-            <div
-              style={{
-                fontSize: "11px",
-                opacity: 0.7,
-                textAlign: "center",
-                lineHeight: "1.2",
-              }}
-            >
+            <div className="text-2xl">{control.icon}</div>
+            <div className="font-bold text-xs lg:text-sm">{control.label}</div>
+            <div className="text-xs opacity-70 text-center leading-tight">
               {control.description}
             </div>
           </button>
         ))}
       </div>
 
-      {/* Keyboard hints */}
-      <div
-        className="keyboard-hints"
-        style={{
-          backgroundColor: "#1a1a1a",
-          padding: "12px",
-          borderRadius: "6px",
-          border: "1px solid #333",
-        }}
-      >
-        <div
-          style={{
-            fontSize: "12px",
-            color: "#888",
-            marginBottom: "8px",
-            fontWeight: "bold",
-          }}
-        >
+      {/* Mobile Touch Instructions */}
+      <div className="lg:hidden bg-gray-800 p-3 rounded-md border border-gray-600 mb-3">
+        <div className="text-xs text-gray-400 font-bold mb-2 text-center">
+          📱 Touch Controls
+        </div>
+        <div className="text-xs text-gray-300 text-center leading-relaxed">
+          Tap the action buttons above to play. Each button performs the corresponding action.
+        </div>
+      </div>
+
+      {/* Keyboard hints - Hidden on mobile */}
+      <div className="hidden lg:block bg-gray-800 p-3 rounded-md border border-gray-600 mb-3">
+        <div className="text-xs text-gray-400 font-bold mb-2">
           🎮 Keyboard Controls
         </div>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
-            gap: "8px",
-            fontSize: "11px",
-          }}
-        >
+        <div className="grid grid-cols-1 gap-2 text-xs">
           {controls.map((control) => (
             <div
               key={control.action}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                color:
-                  disabled || control.disabled || !agentAlive ? "#555" : "#ccc",
-              }}
+              className={`flex items-center gap-2 ${
+                disabled || control.disabled || !agentAlive ? "text-gray-500" : "text-gray-300"
+              }`}
             >
-              <div
-                style={{
-                  backgroundColor: "#333",
-                  border: "1px solid #555",
-                  borderRadius: "3px",
-                  padding: "2px 6px",
-                  fontSize: "10px",
-                  fontFamily: "monospace",
-                  minWidth: "16px",
-                  textAlign: "center",
-                }}
-              >
+              <div className="bg-gray-700 border border-gray-500 rounded px-2 py-1 text-xs font-mono min-w-4 text-center">
                 {control.key}
               </div>
-              <span>{control.label}</span>
+              <span className="text-xs">{control.label}</span>
             </div>
           ))}
         </div>
       </div>
 
       {/* Game status indicators */}
-      <div
-        className="status-indicators"
-        style={{
-          marginTop: "12px",
-          display: "flex",
-          gap: "16px",
-          flexWrap: "wrap",
-          fontSize: "12px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "4px",
-            color: agentAlive ? "#4CAF50" : "#F44336",
-          }}
-        >
-          <div
-            style={{
-              width: "8px",
-              height: "8px",
-              borderRadius: "50%",
-              backgroundColor: agentAlive ? "#4CAF50" : "#F44336",
-            }}
-          />
-          {agentAlive ? "Alive" : "Game Over"}
+      <div className="mt-3 flex flex-wrap gap-4 text-xs">
+        <div className={`flex items-center gap-1 ${agentAlive ? 'text-green-500' : 'text-red-500'}`}>
+          <div className={`w-2 h-2 rounded-full ${agentAlive ? 'bg-green-500' : 'bg-red-500'}`} />
+          {agentAlive ? 'Alive' : 'Game Over'}
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "4px",
-            color: hasGold ? "#FFD700" : "#888",
-          }}
-        >
-          <span>{hasGold ? "💎" : "💎"}</span>
-          {hasGold ? "Has Gold" : "No Gold"}
+        <div className={`flex items-center gap-1 ${hasGold ? 'text-yellow-400' : 'text-gray-400'}`}>
+          <span>💎</span>
+          {hasGold ? 'Has Gold' : 'No Gold'}
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "4px",
-            color: hasArrow ? "#FF6B6B" : "#888",
-          }}
-        >
+        <div className={`flex items-center gap-1 ${hasArrow ? 'text-red-400' : 'text-gray-400'}`}>
           <span>🏹</span>
-          {hasArrow ? "Has Arrow" : "No Arrow"}
+          {hasArrow ? 'Has Arrow' : 'No Arrow'}
         </div>
       </div>
     </div>

@@ -20,7 +20,6 @@ interface GameBoardProps {
 
 export default function GameBoard({ gameState, showHidden }: GameBoardProps) {
   const { grid, agent, gridSize } = gameState;
-  const cellSize = 60;
 
   const getCellContent = (x: number, y: number) => {
     const cell = grid[y][x];
@@ -80,52 +79,25 @@ export default function GameBoard({ gameState, showHidden }: GameBoardProps) {
   };
 
   return (
-    <div className="game-board-container">
+    <div className="flex flex-col">
       <div
-        className="game-grid"
+        className="grid gap-0.5 bg-gray-700 p-2 rounded-lg border-2 border-gray-600 max-w-full overflow-auto justify-center"
         style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${gridSize}, ${cellSize}px)`,
-          gap: "2px",
-          backgroundColor: "#2a2a2a",
-          padding: "8px",
-          borderRadius: "8px",
-          border: "2px solid #444",
+          gridTemplateColumns: `repeat(${gridSize}, minmax(45px, 70px))`,
         }}
       >
         {grid.flatMap((row, y) =>
           row.map((cell, x) => (
             <div
               key={`${x}-${y}`}
-              className="game-cell"
-              style={{
-                width: cellSize,
-                height: cellSize,
-                backgroundColor: "#1a1a1a",
-                border: "1px solid #333",
-                borderRadius: "4px",
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "default",
-              }}
+              className="aspect-square bg-gray-900 border border-gray-500 rounded relative flex items-center justify-center cursor-default min-w-[45px] lg:min-w-[70px]"
             >
               {getCellContent(x, y)}
               {getPerceptIndicators(x, y)}
 
               {/* Grid coordinates for debugging */}
               {process.env.NODE_ENV === "development" && (
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: "2px",
-                    right: "2px",
-                    fontSize: "8px",
-                    color: "#666",
-                    fontFamily: "monospace",
-                  }}
-                >
+                <div className="absolute bottom-0.5 right-0.5 text-xs text-gray-500 font-mono">
                   {x},{y}
                 </div>
               )}
@@ -135,42 +107,32 @@ export default function GameBoard({ gameState, showHidden }: GameBoardProps) {
       </div>
 
       {/* Legend */}
-      <div
-        className="legend"
-        style={{
-          marginTop: "12px",
-          fontSize: "12px",
-          color: "#ccc",
-          display: "flex",
-          gap: "16px",
-          flexWrap: "wrap",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+      <div className="mt-3 text-xs text-gray-300 flex flex-wrap gap-4 justify-center">
+        <div className="flex items-center gap-1">
           <Agent direction="E" hasGold={false} alive={true} />
           <span>Agent</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+        <div className="flex items-center gap-1">
           <Wumpus />
           <span>Wumpus</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+        <div className="flex items-center gap-1">
           <Pit />
           <span>Pit</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+        <div className="flex items-center gap-1">
           <Gold />
           <span>Gold</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+        <div className="flex items-center gap-1">
           <BreezeIndicator />
           <span>Breeze</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+        <div className="flex items-center gap-1">
           <StenchIndicator />
           <span>Stench</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+        <div className="flex items-center gap-1">
           <GlitterIndicator />
           <span>Glitter</span>
         </div>

@@ -71,29 +71,13 @@ export default function GameHistory({ history }: GameHistoryProps) {
   if (history.length === 0) {
     return (
       <div className="game-history">
-        <h3
-          style={{
-            color: "#fff",
-            marginBottom: "12px",
-            fontSize: "18px",
-            fontWeight: "bold",
-          }}
-        >
+        <h3 className="text-white mb-3 text-lg font-bold">
           📜 Adventure Log
         </h3>
-        <div
-          style={{
-            backgroundColor: "#1a1a1a",
-            padding: "20px",
-            borderRadius: "8px",
-            border: "1px solid #333",
-            textAlign: "center",
-            color: "#888",
-          }}
-        >
-          <div style={{ fontSize: "24px", marginBottom: "8px" }}>🗺️</div>
+        <div className="bg-gray-800 p-5 rounded-lg border border-gray-600 text-center text-gray-400">
+          <div className="text-2xl mb-2">🗺️</div>
           <div>Your adventure begins here...</div>
-          <div style={{ fontSize: "12px", marginTop: "4px" }}>
+          <div className="text-xs mt-1">
             Take your first step and watch your story unfold!
           </div>
         </div>
@@ -103,164 +87,66 @@ export default function GameHistory({ history }: GameHistoryProps) {
 
   return (
     <div className="game-history">
-      <h3
-        style={{
-          color: "#fff",
-          marginBottom: "12px",
-          fontSize: "18px",
-          fontWeight: "bold",
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-        }}
-      >
+      <h3 className="text-white mb-3 text-lg font-bold flex items-center gap-2">
         📜 Adventure Log ({history.length} actions)
       </h3>
 
-      <div
-        style={{
-          backgroundColor: "#1a1a1a",
-          borderRadius: "8px",
-          border: "1px solid #333",
-          maxHeight: "400px",
-          overflowY: "auto",
-        }}
-      >
+      <div className="bg-gray-800 rounded-lg border border-gray-600 max-h-96 overflow-y-auto">
         {history.map((step, index) => (
           <div
             key={step.index}
-            className="history-entry"
-            style={{
-              padding: "12px",
-              borderBottom:
-                index < history.length - 1 ? "1px solid #333" : "none",
-              transition: "background-color 0.2s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#222";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "transparent";
-            }}
+            className={`p-3 transition-colors hover:bg-gray-700 ${
+              index < history.length - 1 ? 'border-b border-gray-600' : ''
+            }`}
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: "12px",
-                marginBottom: "8px",
-              }}
-            >
+            <div className="flex items-start gap-3 mb-2">
               {/* Step number */}
-              <div
-                style={{
-                  backgroundColor: "#333",
-                  color: "#fff",
-                  borderRadius: "50%",
-                  width: "24px",
-                  height: "24px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  flexShrink: 0,
-                }}
-              >
+              <div className="bg-gray-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">
                 {step.index}
               </div>
 
               {/* Action info */}
-              <div style={{ flex: 1 }}>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    marginBottom: "4px",
-                  }}
-                >
-                  <span style={{ fontSize: "16px" }}>
-                    {getActionEmoji(step.action)}
-                  </span>
-                  <span
-                    style={{
-                      color: "#fff",
-                      fontWeight: "bold",
-                      textTransform: "capitalize",
-                    }}
-                  >
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-base">{getActionEmoji(step.action)}</span>
+                  <span className="text-white font-bold capitalize">
                     {getActionDescription(step.action)}
                   </span>
                 </div>
 
                 {/* Position and direction */}
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "#aaa",
-                    marginBottom: "6px",
-                  }}
-                >
+                <div className="text-xs text-gray-300 mb-1.5">
                   📍 Position: ({step.resultState.x}, {step.resultState.y}) 🧭
                   Facing: {step.resultState.dir}
                   {step.resultState.hasGold && " 💎 Carrying Gold"}
                 </div>
 
                 {/* Percepts */}
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "#bbb",
-                    marginBottom: "6px",
-                    fontStyle: "italic",
-                  }}
-                >
+                <div className="text-xs text-gray-400 mb-1.5 italic">
                   👁️ {getPerceptEmojis(step.percepts)}
                 </div>
 
                 {/* Reward */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "4px",
-                    fontSize: "12px",
-                  }}
-                >
+                <div className="flex items-center gap-1 text-xs">
                   <span>{getRewardIcon(step.rewardDelta)}</span>
-                  <span
-                    style={{
-                      color: getRewardColor(step.rewardDelta),
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {step.rewardDelta > 0 ? "+" : ""}
-                    {step.rewardDelta} points
+                  <span className={`font-bold ${
+                    step.rewardDelta > 0 ? 'text-green-500' : 
+                    step.rewardDelta < 0 ? 'text-red-500' : 'text-gray-400'
+                  }`}>
+                    {step.rewardDelta > 0 ? "+" : ""}{step.rewardDelta} points
                   </span>
                   {step.rewardDelta >= 1000 && (
-                    <span style={{ color: "#FFD700", fontSize: "10px" }}>
-                      (Great success!)
-                    </span>
+                    <span className="text-yellow-400 text-xs">(Great success!)</span>
                   )}
                   {step.rewardDelta <= -1000 && (
-                    <span style={{ color: "#F44336", fontSize: "10px" }}>
-                      (Game over!)
-                    </span>
+                    <span className="text-red-500 text-xs">(Game over!)</span>
                   )}
                 </div>
               </div>
             </div>
 
             {/* Timestamp */}
-            <div
-              style={{
-                fontSize: "10px",
-                color: "#666",
-                textAlign: "right",
-                fontFamily: "monospace",
-              }}
-            >
+            <div className="text-xs text-gray-500 text-right font-mono">
               {new Date(step.timestamp).toLocaleTimeString()}
             </div>
           </div>
@@ -268,32 +154,14 @@ export default function GameHistory({ history }: GameHistoryProps) {
       </div>
 
       {/* Summary stats */}
-      <div
-        style={{
-          marginTop: "12px",
-          display: "flex",
-          gap: "16px",
-          fontSize: "12px",
-          color: "#888",
-        }}
-      >
+      <div className="mt-3 flex gap-4 text-xs text-gray-400">
         <div>
-          Total Steps:{" "}
-          <span style={{ color: "#fff", fontWeight: "bold" }}>
-            {history.length}
-          </span>
+          Total Steps: <span className="text-white font-bold">{history.length}</span>
         </div>
         <div>
-          Final Score:{" "}
-          <span
-            style={{
-              color:
-                history[history.length - 1]?.rewardDelta > 0
-                  ? "#4CAF50"
-                  : "#F44336",
-              fontWeight: "bold",
-            }}
-          >
+          Final Score: <span className={`font-bold ${
+            history[history.length - 1]?.rewardDelta > 0 ? 'text-green-500' : 'text-red-500'
+          }`}>
             {history.reduce((sum, step) => sum + step.rewardDelta, 0)}
           </span>
         </div>
