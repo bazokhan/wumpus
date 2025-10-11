@@ -1,7 +1,7 @@
 "use client";
 import { trpc } from "@/client/trpc";
-import { Action } from "@/game/types";
-import { useState, useEffect, useCallback } from "react";
+import { Action, Percept } from "@/game/types";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import GameBoard from "./GameBoard";
 import GameControls from "./GameControls";
 import GameHistory from "./GameHistory";
@@ -10,8 +10,15 @@ import { useSound, SoundToggle } from "./SoundManager";
 export default function EnhancedPage() {
   const [gameId, setGameId] = useState<string | null>(null);
   const [showHidden, setShowHidden] = useState(false);
-  const [lastAction, setLastAction] = useState<{ action: string; x: number; y: number; direction?: string } | null>(null);
-  const [newPercepts, setNewPercepts] = useState<{ percept: string; x: number; y: number }[]>([]);
+  const [lastAction, setLastAction] = useState<{
+    action: string;
+    x: number;
+    y: number;
+    direction?: string;
+  } | null>(null);
+  const [newPercepts, setNewPercepts] = useState<
+    { percept: Percept; x: number; y: number }[]
+  >([]);
   const { playSound } = useSound();
   const start = trpc.startGame.useMutation({
     onSuccess: (r) => setGameId(r.gameId),
@@ -30,7 +37,7 @@ export default function EnhancedPage() {
   const doStep = useCallback(
     async (action: Action) => {
       if (!gameId || state.data?.state.terminal) return;
-      
+
       // Set animation data
       const currentState = state.data?.state;
       if (currentState) {
@@ -38,31 +45,31 @@ export default function EnhancedPage() {
           action,
           x: currentState.agent.x,
           y: currentState.agent.y,
-          direction: currentState.agent.dir
+          direction: currentState.agent.dir,
         });
       }
-      
+
       await step.mutateAsync({ gameId, action });
       await state.refetch();
       await history.refetch();
-      
+
       // Play sound effect
       const soundMap: Record<string, string> = {
-        "TurnLeft": "turn",
-        "TurnRight": "turn", 
-        "Forward": "move",
-        "Grab": "grab",
-        "Shoot": "shoot"
+        TurnLeft: "turn",
+        TurnRight: "turn",
+        Forward: "move",
+        Grab: "grab",
+        Shoot: "shoot",
       };
       playSound(soundMap[action] || "move");
-      
+
       // Clear animation after a delay
       setTimeout(() => {
         setLastAction(null);
         setNewPercepts([]);
       }, 1000);
     },
-    [gameId, step, state, history]
+    [gameId, state, step, history, playSound]
   );
 
   const handleCellRightClick = useCallback(
@@ -112,7 +119,10 @@ export default function EnhancedPage() {
   }, [handleKeyPress]);
 
   const gameState = state.data?.state;
-  const gameHistory = history.data?.history || [];
+  const gameHistory = useMemo(
+    () => history.data?.history || [],
+    [history.data?.history]
+  );
 
   // Watch for game state changes to play appropriate sounds
   useEffect(() => {
@@ -205,19 +215,35 @@ export default function EnhancedPage() {
               </div>
               <div className="text-center">
                 <div className="text-white text-sm">❤️ Status</div>
-                <div className={`font-bold ${gameState.agent.alive ? 'text-green-500' : 'text-red-500'}`}>
+                <div
+                  className={`font-bold ${
+                    gameState.agent.alive ? "text-green-500" : "text-red-500"
+                  }`}
+                >
                   {gameState.agent.alive ? "Alive" : "Dead"}
                 </div>
               </div>
               <div className="text-center">
                 <div className="text-white text-sm">💎 Gold</div>
-                <div className={`font-bold ${gameState.agent.hasGold ? 'text-yellow-400' : 'text-gray-400'}`}>
+                <div
+                  className={`font-bold ${
+                    gameState.agent.hasGold
+                      ? "text-yellow-400"
+                      : "text-gray-400"
+                  }`}
+                >
                   {gameState.agent.hasGold ? "Found" : "Not Found"}
                 </div>
               </div>
               <div className="text-center">
                 <div className="text-white text-sm">🏆 Score</div>
-                <div className={`font-bold ${gameState.totalReward >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                <div
+                  className={`font-bold ${
+                    gameState.totalReward >= 0
+                      ? "text-green-500"
+                      : "text-red-500"
+                  }`}
+                >
                   {gameState.totalReward}
                 </div>
               </div>
@@ -225,12 +251,16 @@ export default function EnhancedPage() {
 
             {gameState.terminal && (
               <div className="text-center">
-                <div className={`inline-block px-4 py-2 rounded-full text-sm font-bold ${
-                  gameState.totalReward >= 1000 
-                    ? 'bg-green-500 text-white' 
-                    : 'bg-red-500 text-white'
-                }`}>
-                  {gameState.totalReward >= 1000 ? "🎉 Victory!" : "💀 Game Over!"}
+                <div
+                  className={`inline-block px-4 py-2 rounded-full text-sm font-bold ${
+                    gameState.totalReward >= 1000
+                      ? "bg-green-500 text-white"
+                      : "bg-red-500 text-white"
+                  }`}
+                >
+                  {gameState.totalReward >= 1000
+                    ? "🎉 Victory!"
+                    : "💀 Game Over!"}
                 </div>
               </div>
             )}
@@ -240,9 +270,9 @@ export default function EnhancedPage() {
           <div className="flex flex-col lg:flex-row gap-5">
             {/* Game Board */}
             <div className="flex-1 flex justify-center">
-              <GameBoard 
-                gameState={gameState} 
-                showHidden={showHidden} 
+              <GameBoard
+                gameState={gameState}
+                showHidden={showHidden}
                 onCellRightClick={handleCellRightClick}
                 lastAction={lastAction || undefined}
                 newPercepts={newPercepts}

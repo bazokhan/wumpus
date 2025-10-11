@@ -1,5 +1,11 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 
 interface SoundContextType {
   isMuted: boolean;
@@ -18,9 +24,17 @@ export function useSound() {
 }
 
 // Simple sound generator using Web Audio API
-function createSound(frequency: number, duration: number = 200, type: OscillatorType = "sine"): void {
+function createSound(
+  frequency: number,
+  duration: number = 200,
+  type: OscillatorType = "sine"
+): void {
   try {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const AudioContextClass =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext;
+    const audioContext = new AudioContextClass();
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
 
@@ -31,7 +45,10 @@ function createSound(frequency: number, duration: number = 200, type: Oscillator
     oscillator.type = type;
 
     gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
+    gainNode.gain.exponentialRampToValueAtTime(
+      0.01,
+      audioContext.currentTime + duration / 1000
+    );
 
     oscillator.start(audioContext.currentTime);
     oscillator.stop(audioContext.currentTime + duration / 1000);
@@ -59,7 +76,7 @@ const sounds = {
     createSound(523, 200, "sine"); // C5
     setTimeout(() => createSound(659, 200, "sine"), 200); // E5
     setTimeout(() => createSound(784, 300, "sine"), 400); // G5
-  }
+  },
 };
 
 export function SoundProvider({ children }: { children: React.ReactNode }) {
@@ -70,14 +87,17 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("wumpus-sound-muted", (!isMuted).toString());
   };
 
-  const playSound = (soundName: string) => {
-    if (isMuted) return;
-    
-    const soundFunction = sounds[soundName as keyof typeof sounds];
-    if (soundFunction) {
-      soundFunction();
-    }
-  };
+  const playSound = useCallback(
+    (soundName: string) => {
+      if (isMuted) return;
+
+      const soundFunction = sounds[soundName as keyof typeof sounds];
+      if (soundFunction) {
+        soundFunction();
+      }
+    },
+    [isMuted]
+  );
 
   useEffect(() => {
     const savedMuteState = localStorage.getItem("wumpus-sound-muted");

@@ -54,12 +54,6 @@ export default function GameHistory({ history }: GameHistoryProps) {
       : "Nothing detected";
   };
 
-  const getRewardColor = (reward: number) => {
-    if (reward > 0) return "#4CAF50";
-    if (reward < 0) return "#F44336";
-    return "#888";
-  };
-
   const getRewardIcon = (reward: number) => {
     if (reward >= 1000) return "🎉";
     if (reward > 0) return "✅";
