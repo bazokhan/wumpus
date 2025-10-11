@@ -69,14 +69,30 @@ export function startGame(gridSize = 4): GameState {
   };
   // Generate random seed for each new game to ensure different grids
   const seed = Math.floor(Math.random() * 1000000);
+  const grid = newGrid(gridSize, seed);
+  
+  // Calculate initial percepts for the starting position
+  const initialPercepts = percepts(grid, agent);
+  
+  // Store persistent percepts in the starting cell
+  const startingCell = grid[agent.y][agent.x];
+  startingCell.persistentPercepts = { ...initialPercepts };
+  
   return {
     gameId: crypto.randomUUID(),
     gridSize,
-    grid: newGrid(gridSize, seed),
+    grid,
     agent,
     terminal: false,
     totalReward: 0,
-    history: [],
+    history: [{
+      index: 0,
+      action: "Start" as Action, // Special action for initial state
+      resultState: agent,
+      percepts: initialPercepts,
+      rewardDelta: 0,
+      timestamp: Date.now(),
+    }],
   };
 }
 
@@ -105,7 +121,7 @@ function percepts(g: Grid, a: AgentState): Percepts {
     [0, -1],
   ];
   const inb = (x: number, y: number) =>
-    y >= 0 && x >= 0 && y < g.length && x < g.length;
+    y >= 0 && x >= 0 && y < g.length && x < g[0].length;
   const neigh = adj
     .map(([dx, dy]) => [a.x + dx, a.y + dy] as const)
     .filter(([x, y]) => inb(x, y));
@@ -113,6 +129,26 @@ function percepts(g: Grid, a: AgentState): Percepts {
   const stench = neigh.some(([x, y]) => g[y][x].wumpus);
   const glitter = !!g[a.y][a.x].gold;
   return { breeze, stench, glitter, bump: false, scream: false };
+}
+
+export function toggleCellColor(state: GameState, x: number, y: number): GameState {
+  if (x < 0 || y < 0 || x >= state.gridSize || y >= state.gridSize) return state;
+  
+  const cell = state.grid[y][x];
+  const currentColor = cell.userColor;
+  
+  // Cycle through: undefined -> green -> yellow -> red -> undefined
+  if (!currentColor) {
+    cell.userColor = "green";
+  } else if (currentColor === "green") {
+    cell.userColor = "yellow";
+  } else if (currentColor === "yellow") {
+    cell.userColor = "red";
+  } else {
+    delete cell.userColor;
+  }
+  
+  return { ...state };
 }
 
 export function step(state: GameState, action: Action): GameState {
@@ -124,6 +160,9 @@ export function step(state: GameState, action: Action): GameState {
   const a = { ...state.agent };
 
   switch (action) {
+    case "Start":
+      // Start action doesn't change anything, just returns current state
+      break;
     case "TurnLeft":
       a.dir = left(a.dir);
       break;
@@ -193,6 +232,10 @@ export function step(state: GameState, action: Action): GameState {
   const p = percepts(state.grid, a);
   p.bump = bump;
   p.scream = scream;
+
+  // Store persistent percepts in the cell
+  const currentCell = state.grid[a.y][a.x];
+  currentCell.persistentPercepts = { ...p };
 
   state.agent = a;
   state.totalReward += reward;

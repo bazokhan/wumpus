@@ -9,3 +9,7 @@ export { default as PageLayout } from "./PageLayout";
 
 // Graphics exports
 export * from "./graphics";
+
+// Animation and Sound exports
+export { ActionAnimation, PerceptAnimation } from "./Animations";
+export { SoundProvider, SoundToggle, useSound } from "./SoundManager";

@@ -1,6 +1,8 @@
 export type Direction = "N" | "E" | "S" | "W";
 
-export type Action = "TurnLeft" | "TurnRight" | "Forward" | "Grab" | "Shoot";
+export type Action = "TurnLeft" | "TurnRight" | "Forward" | "Grab" | "Shoot" | "Start";
+
+export type Percept = "breeze" | "stench" | "glitter" | "bump" | "scream";
 
 export type Percepts = {
   breeze: boolean;
@@ -10,7 +12,13 @@ export type Percepts = {
   scream: boolean;
 };
 
-export type Cell = { pit?: boolean; wumpus?: boolean; gold?: boolean };
+export type Cell = { 
+  pit?: boolean; 
+  wumpus?: boolean; 
+  gold?: boolean;
+  userColor?: "green" | "yellow" | "red"; // User's color marking
+  persistentPercepts?: Percepts; // Percepts that persist when leaving the cell
+};
 
 export type Grid = Cell[][]; // [y][x]
 

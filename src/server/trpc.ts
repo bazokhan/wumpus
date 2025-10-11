@@ -1,6 +1,6 @@
 import { initTRPC } from "@trpc/server";
 import { z } from "zod";
-import { startGame, step as stepGame } from "@/game/engine";
+import { startGame, step as stepGame, toggleCellColor } from "@/game/engine";
 import { GameStore } from "@/game/store";
 
 const t = initTRPC.create();
@@ -11,11 +11,17 @@ const startGameInputSchema = z
 
 const stepGameInputSchema = z.object({
   gameId: z.string(),
-  action: z.enum(["TurnLeft", "TurnRight", "Forward", "Grab", "Shoot"]),
+  action: z.enum(["TurnLeft", "TurnRight", "Forward", "Grab", "Shoot", "Start"]),
 });
 
 const getStateInputSchema = z.object({ gameId: z.string() });
 const getHistoryInputSchema = z.object({ gameId: z.string() });
+
+const toggleCellColorInputSchema = z.object({
+  gameId: z.string(),
+  x: z.number().min(0),
+  y: z.number().min(0),
+});
 
 export const appRouter = t.router({
   startGame: t.procedure.input(startGameInputSchema).mutation(({ input }) => {
@@ -43,6 +49,14 @@ export const appRouter = t.router({
     const gs = GameStore.get(input.gameId);
     if (!gs) throw new Error("Game not found");
     return { history: gs.history };
+  }),
+
+  toggleCellColor: t.procedure.input(toggleCellColorInputSchema).mutation(({ input }) => {
+    const gs = GameStore.get(input.gameId);
+    if (!gs) throw new Error("Game not found");
+    const updated = toggleCellColor(gs, input.x, input.y);
+    GameStore.update(input.gameId, updated);
+    return { state: updated };
   }),
 });
 

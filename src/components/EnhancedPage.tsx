@@ -5,14 +5,19 @@ import { useState, useEffect, useCallback } from "react";
 import GameBoard from "./GameBoard";
 import GameControls from "./GameControls";
 import GameHistory from "./GameHistory";
+import { useSound, SoundToggle } from "./SoundManager";
 
 export default function EnhancedPage() {
   const [gameId, setGameId] = useState<string | null>(null);
   const [showHidden, setShowHidden] = useState(false);
+  const [lastAction, setLastAction] = useState<{ action: string; x: number; y: number; direction?: string } | null>(null);
+  const [newPercepts, setNewPercepts] = useState<{ percept: string; x: number; y: number }[]>([]);
+  const { playSound } = useSound();
   const start = trpc.startGame.useMutation({
     onSuccess: (r) => setGameId(r.gameId),
   });
   const step = trpc.step.useMutation();
+  const toggleCellColor = trpc.toggleCellColor.useMutation();
   const state = trpc.getState.useQuery(
     { gameId: gameId! },
     { enabled: !!gameId, refetchOnWindowFocus: false }
@@ -25,11 +30,48 @@ export default function EnhancedPage() {
   const doStep = useCallback(
     async (action: Action) => {
       if (!gameId || state.data?.state.terminal) return;
+      
+      // Set animation data
+      const currentState = state.data?.state;
+      if (currentState) {
+        setLastAction({
+          action,
+          x: currentState.agent.x,
+          y: currentState.agent.y,
+          direction: currentState.agent.dir
+        });
+      }
+      
       await step.mutateAsync({ gameId, action });
       await state.refetch();
       await history.refetch();
+      
+      // Play sound effect
+      const soundMap: Record<string, string> = {
+        "TurnLeft": "turn",
+        "TurnRight": "turn", 
+        "Forward": "move",
+        "Grab": "grab",
+        "Shoot": "shoot"
+      };
+      playSound(soundMap[action] || "move");
+      
+      // Clear animation after a delay
+      setTimeout(() => {
+        setLastAction(null);
+        setNewPercepts([]);
+      }, 1000);
     },
     [gameId, step, state, history]
+  );
+
+  const handleCellRightClick = useCallback(
+    async (x: number, y: number) => {
+      if (!gameId) return;
+      await toggleCellColor.mutateAsync({ gameId, x, y });
+      await state.refetch();
+    },
+    [gameId, toggleCellColor, state]
   );
 
   // Keyboard event handler
@@ -72,6 +114,30 @@ export default function EnhancedPage() {
   const gameState = state.data?.state;
   const gameHistory = history.data?.history || [];
 
+  // Watch for game state changes to play appropriate sounds
+  useEffect(() => {
+    if (!gameState || !gameHistory.length) return;
+
+    const lastStep = gameHistory[gameHistory.length - 1];
+    if (!lastStep) return;
+
+    const { percepts } = lastStep;
+
+    // Play percept sounds
+    if (percepts.scream) playSound("scream");
+    if (percepts.breeze) playSound("breeze");
+    if (percepts.stench) playSound("stench");
+    if (percepts.glitter) playSound("glitter");
+    if (percepts.bump) playSound("bump");
+
+    // Play game state sounds
+    if (!gameState.agent.alive) {
+      playSound("death");
+    } else if (gameState.terminal && gameState.totalReward >= 1000) {
+      playSound("victory");
+    }
+  }, [gameState, gameHistory, playSound]);
+
   return (
     <main className="p-4 max-w-7xl mx-auto font-sans">
       {/* Header */}
@@ -86,7 +152,7 @@ export default function EnhancedPage() {
         </div>
 
         {gameState && (
-          <div className="flex justify-center lg:justify-end">
+          <div className="flex justify-center lg:justify-end gap-2">
             <label className="flex items-center gap-2 text-gray-300 text-sm cursor-pointer px-3 py-2 bg-gray-800 rounded-md border border-gray-600 hover:border-green-500 transition-colors">
               <input
                 type="checkbox"
@@ -96,6 +162,7 @@ export default function EnhancedPage() {
               />
               Show Hidden Elements
             </label>
+            <SoundToggle />
           </div>
         )}
       </div>
@@ -173,13 +240,23 @@ export default function EnhancedPage() {
           <div className="flex flex-col lg:flex-row gap-5">
             {/* Game Board */}
             <div className="flex-1 flex justify-center">
-              <GameBoard gameState={gameState} showHidden={showHidden} />
+              <GameBoard 
+                gameState={gameState} 
+                showHidden={showHidden} 
+                onCellRightClick={handleCellRightClick}
+                lastAction={lastAction || undefined}
+                newPercepts={newPercepts}
+              />
             </div>
 
             {/* Controls */}
             <div className="lg:w-80 lg:min-w-80">
               <GameControls
                 onAction={doStep}
+                onRestart={() => {
+                  setGameId(null);
+                  setShowHidden(false);
+                }}
                 disabled={gameState.terminal}
                 agentAlive={gameState.agent.alive}
                 hasGold={gameState.agent.hasGold}

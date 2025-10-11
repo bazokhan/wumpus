@@ -4,6 +4,7 @@ import type { Action } from "@/game/types";
 
 interface GameControlsProps {
   onAction: (action: Action) => void;
+  onRestart?: () => void;
   disabled?: boolean;
   agentAlive: boolean;
   hasGold: boolean;
@@ -12,6 +13,7 @@ interface GameControlsProps {
 
 export default function GameControls({
   onAction,
+  onRestart,
   disabled = false,
   agentAlive,
   hasGold,
@@ -79,6 +81,19 @@ export default function GameControls({
           </button>
         ))}
       </div>
+
+      {/* Restart Button */}
+      {onRestart && (
+        <div className="mb-4">
+          <button
+            onClick={onRestart}
+            className="w-full flex items-center justify-center gap-2 p-3 lg:p-4 border-2 border-red-600 rounded-lg transition-all duration-200 bg-red-800 text-white hover:bg-red-700 hover:border-red-500 font-bold"
+          >
+            <div className="text-xl">🔄</div>
+            <div className="text-sm lg:text-base">Restart Game</div>
+          </button>
+        </div>
+      )}
 
       {/* Mobile Touch Instructions */}
       <div className="lg:hidden bg-gray-800 p-3 rounded-md border border-gray-600 mb-3">
