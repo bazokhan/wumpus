@@ -1,4 +1,7 @@
 import type { Action, AgentState, GameState, Grid, Percepts } from "./types";
+import { randomUUID } from "crypto";
+
+export const ENGINE_VERSION = "1.0.0";
 
 // Simple seeded random number generator (LCG algorithm)
 function seededRandom(seed: number) {
@@ -58,7 +61,7 @@ export function newGrid(n: number, seed = 42): Grid {
   return g;
 }
 
-export function startGame(gridSize = 4): GameState {
+export function startGame(gridSize = 4, providedSeed?: number): GameState {
   const agent: AgentState = {
     x: 0,
     y: 0,
@@ -67,8 +70,8 @@ export function startGame(gridSize = 4): GameState {
     arrow: 1,
     alive: true,
   };
-  // Generate random seed for each new game to ensure different grids
-  const seed = Math.floor(Math.random() * 1000000);
+  // Generate or use provided seed for reproducible grids
+  const seed = providedSeed ?? Math.floor(Math.random() * 1000000);
   const grid = newGrid(gridSize, seed);
   
   // Calculate initial percepts for the starting position
@@ -79,12 +82,14 @@ export function startGame(gridSize = 4): GameState {
   startingCell.persistentPercepts = { ...initialPercepts };
   
   return {
-    gameId: crypto.randomUUID(),
+    gameId: globalThis.crypto?.randomUUID?.() ?? randomUUID(),
     gridSize,
     grid,
     agent,
     terminal: false,
     totalReward: 0,
+    seed,
+    engineVersion: ENGINE_VERSION,
     history: [{
       index: 0,
       action: "Start" as Action, // Special action for initial state

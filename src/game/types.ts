@@ -48,4 +48,6 @@ export type GameState = {
   terminal: boolean;
   totalReward: number;
   history: Step[]; // can be omitted from “getState” for lighter payloads
+  seed: number; // RNG seed for reproducibility
+  engineVersion: string; // engine version used to produce this state
 };

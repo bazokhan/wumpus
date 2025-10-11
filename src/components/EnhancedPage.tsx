@@ -6,6 +6,9 @@ import GameBoard from "./GameBoard";
 import GameControls from "./GameControls";
 import GameHistory from "./GameHistory";
 import { useSound, SoundToggle } from "./SoundManager";
+import AgentControls from "./AgentControls";
+import ReplayPlayer from "./ReplayPlayer";
+import ReportsPanel from "./ReportsPanel";
 
 export default function EnhancedPage() {
   const [gameId, setGameId] = useState<string | null>(null);
@@ -280,7 +283,7 @@ export default function EnhancedPage() {
             </div>
 
             {/* Controls */}
-            <div className="lg:w-80 lg:min-w-80">
+            <div className="lg:w-80 lg:min-w-80 flex flex-col gap-4">
               <GameControls
                 onAction={doStep}
                 onRestart={() => {
@@ -292,12 +295,25 @@ export default function EnhancedPage() {
                 hasGold={gameState.agent.hasGold}
                 hasArrow={gameState.agent.arrow > 0}
               />
+              <AgentControls onEpisodeCreated={() => {
+                // optionally surface a toast; for now no-op
+              }} />
             </div>
           </div>
 
           {/* Game History */}
           <div className="mt-5">
             <GameHistory history={gameHistory} />
+          </div>
+
+          {/* Replay Panel */}
+          <div className="mt-5">
+            <ReplayPlayer />
+          </div>
+
+          {/* Reports Panel */}
+          <div className="mt-5">
+            <ReportsPanel />
           </div>
 
           {/* Restart Button */}

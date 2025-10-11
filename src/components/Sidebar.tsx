@@ -39,6 +39,12 @@ export default function Sidebar() {
       description: "Play Wumpus World"
     },
     {
+      href: "/agents",
+      label: "Agents & Episodes",
+      icon: "🤖",
+      description: "Run agents, replays, docs"
+    },
+    {
       href: "/about-wumpus",
       label: "About Wumpus World",
       icon: "🗺️",

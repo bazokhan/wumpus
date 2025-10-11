@@ -6,7 +6,10 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "agents:run": "node scripts/run-agent.mjs",
+    "agents:list": "node scripts/run-agent.mjs --list",
+    "agents:stats": "node scripts/run-agent.mjs --stats"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.2",
